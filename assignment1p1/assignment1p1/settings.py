@@ -25,7 +25,7 @@ SECRET_KEY = 'tbb8k8$^9vkh6uu6fzra%xglgg$bga^p569d-4x64$e2iu@$zj'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['http://pjunius416.pythonanywhere.com/']
 
 
 # Application definition
