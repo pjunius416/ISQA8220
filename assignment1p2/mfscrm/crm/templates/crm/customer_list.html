@@ -68,9 +68,8 @@
                     class="btn btn-danger">Delete</a>
                 </td>
 
-                <td><a href=""
-                       class="btn btn-primary">Summary</a>
-
+                <td><a href="{% url 'crm:summary' pk=customer.pk %}"
+                    class="btn btn-primary">Summary</a>
             </tr>
         {% endfor %}
         </tbody>
