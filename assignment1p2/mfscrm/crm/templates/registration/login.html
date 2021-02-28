@@ -10,9 +10,9 @@
     <form method="post" action="{% url 'login' %}">
          {{ form.as_p }}
         {% csrf_token %}
-
-
-        <input type="submit" value="login"/>
+        <button style="background-color:#F4EB16; color:blue" class="btn btn-outline-info" type="submit">Login</button>
+    </form>
+    Don't have an account? <a href="/register" target="blank"><strong>register here</strong></a>!
         <input type="hidden" name="next" value="{{ next }}"/>
     </form>
 {% endblock %}

@@ -1,4 +1,6 @@
 from django.contrib.auth.decorators import login_required
+from django.core.files.storage import FileSystemStorage
+from django.http import HttpResponse, HttpResponseNotFound
 from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Sum 
 from .models import *
@@ -32,6 +34,22 @@ def customer_edit(request, pk):
         # edit
        form = CustomerForm(instance=customer)
    return render(request, 'crm/customer_edit.html', {'form': form})
+
+@login_required
+def customer_new(request):
+   if request.method == "POST":
+       form = CustomerForm(request.POST)
+       if form.is_valid():
+           customer = form.save(commit=False)
+           customer.created_date = timezone.now()
+           customer.save()
+           customers = Customer.objects.filter(created_date__lte=timezone.now())
+           return render(request, 'crm/customer_list.html',
+                         {'customers': customers})
+   else:
+       form = CustomerForm()
+       # print("Else")
+   return render(request, 'crm/customer_new.html', {'form': form})
 
 @login_required
 def customer_delete(request, pk):
@@ -138,11 +156,26 @@ def summary(request, pk):
 
     for i in sum_product_charge:
         for j in sum_service_charge:
-            total = sum_product_charge[i] + sum_service_charge[j]
+            product_charge = "$" + str(sum_product_charge[i])
+            service_charge = "$" + str(sum_service_charge[j])
+            total = "$" + str(sum_product_charge[i] + sum_service_charge[j])
             
     return render(request, 'crm/summary.html', {'customers': customers,
                                                     'products': products,
                                                     'services': services,
-                                                    'sum_service_charge': sum_service_charge,
-                                                    'sum_product_charge': sum_product_charge,
+                                                    'service_charge': service_charge,
+                                                    'product_charge': product_charge,
                                                     'total': total})
+    
+@login_required   
+def summary_pdf(request, pk):
+    customer = get_object_or_404(Customer, pk=pk)
+    fs = FileSystemStorage()
+    filename = 'summary.pdf'
+    if fs.exists(filename):
+        with fs.open(filename) as pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            response['Content-Disposition'] = 'attachment; filename=summary.pdf"'
+            return response
+    else:
+        return HttpResponseNotFound('The requested pdf was not found in our server.')
